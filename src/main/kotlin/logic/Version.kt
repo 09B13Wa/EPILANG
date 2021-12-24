@@ -1,18 +1,19 @@
 package logic
 
-import java.util.function.Function
+import kotlin.math.pow
 
 class Version: Cloneable, Comparable<Version> {
-    private var majorVal: Int
-    private var minorVal: Int
-    private var buildVal: Int
-    private var revisionVal: Int
+    private var majorVal: Int = 0
+    private var minorVal: Int = 0
+    private var buildVal: Int = -1
+    private var revisionVal: Int = -1
 
     var major: Int
         get() {
             return majorVal
         }
         private set(value) {
+            checkForNegativeNumbers(value,"major")
             majorVal = value
         }
 
@@ -21,6 +22,7 @@ class Version: Cloneable, Comparable<Version> {
             return minorVal
         }
         private set(value) {
+            checkForNegativeNumbers(value, "minor")
             minorVal = value
         }
 
@@ -29,6 +31,9 @@ class Version: Cloneable, Comparable<Version> {
             return buildVal
         }
         private set(value)  {
+            if (value < -1) {
+                throw IllegalArgumentException("Error: the build value can't be inferior to -1")
+            }
             buildVal = value
         }
 
@@ -37,35 +42,39 @@ class Version: Cloneable, Comparable<Version> {
             return revisionVal
         }
         private set(value) {
+            if (value < -1) {
+                throw IllegalArgumentException("Error: the revision value can't be inferior to -1")
+            }
             revisionVal = value
         }
 
     var majorRevision: Short
         get() {
-            val majorCopy: Int = majorVal
-            val shiftedValue: Int = majorCopy.shr(16)
+            val revisionCopy: Int = revisionVal
+            val shiftedValue: Int = revisionCopy.shr(16)
             return shiftedValue.toShort()
         }
         set(value) {
-            val majorCopy: Int = majorVal
-            val minorRevisionShift: Int = majorCopy.shr(16)
-            val lowerBits: Int = majorVal - minorRevisionShift
+            val revisionCopy: Int = revisionVal
+            val minorRevisionShift: Int = revisionCopy.shr(16)
+            val lowerBits: Int = revisionVal - minorRevisionShift
             val valueInt: Int = value.toInt()
             val upperBits: Int = valueInt.shl(16)
-            majorVal = lowerBits + upperBits
+            revisionVal = lowerBits + upperBits
         }
 
     var minorRevision: Short
         get() {
-            val majorCopy: Int = majorVal
-            val shiftedValue: Int = majorCopy.shr(16)
-            val toReturn: Int = majorVal - shiftedValue
+            val revisionCopy: Int = revisionVal
+            var shiftedValue: Int = revisionCopy.shr(16)
+            shiftedValue *= (2.0.pow(16)).toInt()
+            val toReturn: Int = revisionVal - shiftedValue
             return toReturn.toShort()
         }
         set(value) {
-            majorVal = majorVal.shr(16)
-            majorVal = majorVal.shl(16)
-            majorVal += minorRevision
+            revisionVal = revisionVal.shr(16)
+            revisionVal = revisionVal.shl(16)
+            revisionVal += value
         }
 
     init {
@@ -75,84 +84,76 @@ class Version: Cloneable, Comparable<Version> {
         revisionVal = -1
     }
 
+    constructor() {
+        majorVal = 0
+        minorVal = 0
+        buildVal = -1
+        revisionVal = -1
+    }
+
     constructor(version: Version) {
         majorVal = version.major
         minorVal = version.minor
-        buildVal = version.buildVal
-        revisionVal = version.buildVal
+        buildVal = version.build
+        revisionVal = version.revision
     }
 
     constructor(versionString: String) {
         val valuesToAssign: Quadruple<Int, Int, Int, Int> = parseVersionString(versionString)
-        checkForNegativeNumbers(valuesToAssign.first, "major")
-        majorVal = valuesToAssign.first
-        checkForNegativeNumbers(valuesToAssign.second, "minor")
-        minorVal = valuesToAssign.second
-        if (valuesToAssign.third < -1) {
-            throw IllegalArgumentException("Error: the build value can't be inferior to -1")
-        }
-        buildVal = valuesToAssign.third
-
-        if (valuesToAssign.third < -1) {
-            throw IllegalArgumentException("Error: the revision value can't be inferior to -1")
-        }
-        revisionVal = valuesToAssign.forth
+        major = valuesToAssign.first
+        minor = valuesToAssign.second
+        build = valuesToAssign.third
+        revision = valuesToAssign.forth
     }
 
     constructor(major: Int) {
-        this.majorVal = major
+        this.major = major
         minorVal = 0
         buildVal = -1
         revisionVal = -1
     }
 
     constructor(major: Int, minor: Int) {
-        this.majorVal = major
-        this.minorVal = minor
+        this.major = major
+        this.minor = minor
         buildVal = -1
         revisionVal = -1
     }
 
     constructor(major: Int, minor: Int, build: Int) {
-        checkForNegativeNumbers(major, "major")
-        this.majorVal = major
-        checkForNegativeNumbers(minor, "minor")
-        this.minorVal = minor
-        if (build < -1) {
-            throw IllegalArgumentException("Error: the revision value can't be inferior to -1")
-        }
-        this.buildVal = build
+        this.major = major
+        this.minor = minor
+        this.build = build
         revisionVal = -1
     }
 
     constructor(major: Int, minor: Int, build: Int, revision: Int) {
-        checkForNegativeNumbers(major, "major")
-        this.majorVal = major
-        checkForNegativeNumbers(minor, "minor")
-        this.minorVal = minor
-        if (build < -1) {
-            throw IllegalArgumentException("Error: the revision value can't be inferior to -1")
-        }
-        this.buildVal = build
-        if (revision < -1) {
-            throw IllegalArgumentException("Error: the revision value can't be inferior to -1")
-        }
-        this.revisionVal = revision
+        this.major = major
+        this.minor = minor
+        this.build = build
+        this.revision = revision
+    }
+
+    constructor(double: Double) {
+        val integerPart: Int = double.toInt()
+        val floatingPart: Int = getNewMinorString(double)
+        major = integerPart
+        minor = floatingPart
     }
 
     private fun parseVersionString(versionString: String): Quadruple<Int, Int, Int, Int> {
         val compartments: List<String> = versionString.split(Regex("\\."))
         val numberOfCompartments: Int = compartments.size
-        if (numberOfCompartments < 2 || numberOfCompartments > 4) {
-            throw IllegalArgumentException("Error: expected 2, 3 or 4 arguments but got $numberOfCompartments")
+        if (numberOfCompartments < 1 || numberOfCompartments > 4) {
+            throw IllegalArgumentException("Error: expected 1, 2, 3 or 4 arguments but got $numberOfCompartments")
         }
         val majorStr: String = compartments[0]
-        val minorStr: String = compartments[1]
+        val minorStr: String = if(numberOfCompartments > 1) compartments[1] else "0"
         val buildStr: String = if(numberOfCompartments > 2) compartments[2] else "-1"
         val revisionStr: String = if(numberOfCompartments > 3) compartments[3] else "-1"
         val major: Int = majorStr.toInt()
         val minor: Int = minorStr.toInt()
-        val build: Int = minorStr.toInt()
+        val build: Int = buildStr.toInt()
         val revision: Int = revisionStr.toInt()
         return Quadruple(major, minor, build, revision)
     }

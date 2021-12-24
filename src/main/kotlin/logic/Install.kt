@@ -5,7 +5,7 @@ import java.io.File
 class Install {
     private var location: String
     private var versionVal: Version
-    private var installArchitecture: GeneralTree<Pair<Boolean, String>>
+    private var installArchitecture: GeneralTree<Triple<Boolean, String>>
     //address for getting information in case it isn't installed
     private var address: String
 
@@ -82,22 +82,31 @@ class Install {
         fun getFilesToInstall(currentFiles: GeneralTree<Pair<Boolean, String>>, toInstallFiles: GeneralTree<Pair<Boolean, String>>, currentPath: String): List<Pair<Boolean, String>> {
             val filesToInstall: MutableList<Pair<Boolean, String>> = mutableListOf()
             for (currentFile in currentFiles.getChildren()) {
-                if (currentFile.value.first) {
+                if (currentFile.getValue().first) {
                     //if the current file is a directory
-                    val newPath: String = currentPath + currentFile.value.second + "/"
-                    val newCurrentFiles: GeneralTree<Pair<Boolean, String>> = currentFiles.getChild(currentFile.value.second)
-                    val newToInstallFiles: GeneralTree<Pair<Boolean, String>> = toInstallFiles.getChild(currentFile.value.second)
-                    filesToInstall.addAll(getFilesToInstall(newCurrentFiles, newToInstallFiles, newPath))
+                    val newPath: String = currentPath + currentFile.getValue().second + "/"
+                    val newInternalNode: GeneralTree<Pair<Boolean, String>> = toInstallFiles.getChild(newPath)
                 } else {
-                    if (toInstallFiles.value.second != (currentFile.value.second)) {
-                        filesToInstall.add(Pair(false, currentPath + currentFile.value.second))
+                    if (!toInstallFiles.contains(currentFile)) {
+                        filesToInstall.add(Pair(false, currentFile.getValue().second))
                     }
                 }
             }
             return filesToInstall
         }
 
-        dfs(currentFiles, toInstallFiles)
+        val filesToInstall: List<Pair<Boolean, String>> = getFilesToInstall(currentFiles, toInstallFiles, location)
+        for (file in filesToInstall) {
+            if (file.first) {
+                //if the file is a directory
+                val newFile: File = File(file.second)
+                newFile.mkdir()
+            } else {
+                //if the file is a file
+                val newFile: File = File(file.second)
+                newFile.createNewFile()
+            }
+        }
     }
 
     //install a file from the address

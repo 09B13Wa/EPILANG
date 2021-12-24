@@ -18,10 +18,16 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation("org.junit.jupiter:junit-jupiter:5.7.0")
+    testImplementation(kotlin("test"))
 }
 
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "11"
+}
+
+tasks.test() {
+    useJUnitPlatform()
 }
 
 compose.desktop {
