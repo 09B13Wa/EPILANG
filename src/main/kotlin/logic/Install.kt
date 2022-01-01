@@ -2,7 +2,7 @@ package logic
 
 import java.io.File
 
-class Install {
+/*class Install {
     private var location: String
     private var versionVal: Version
     private var installArchitecture: GeneralTree<Triple<Boolean, String>>
@@ -115,4 +115,4 @@ class Install {
         val fileToCopy: File = File(address + fileName)
         file.writeText(fileToCopy.readText())
     }
-}
+}*/

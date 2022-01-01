@@ -32,7 +32,7 @@ tasks.test() {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "me.jaschamerle.compose.Main"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "EpilangDesktop"
