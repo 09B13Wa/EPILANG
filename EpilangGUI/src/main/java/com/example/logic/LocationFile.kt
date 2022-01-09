@@ -2,7 +2,12 @@ package com.example.logic
 
 import java.io.File
 
-class LocationFile{
+/**
+ * LocationFile class is used to store the locations of files.
+ * It keeps track of the location of files as well as an associated name
+ * for easy access and configuration.
+ */
+class LocationFile {
     private var locationVal: String = ""
     private var fileNameVal: String = ""
     private var locationsVal: MutableMap<String, String> = mutableMapOf()
@@ -11,30 +16,55 @@ class LocationFile{
     private var file: File = File("")
     private var locationLines: MutableMap<String, Int> = mutableMapOf()
 
+    /**
+     * The location of the location file.
+     * @return the location of the location file.
+     * The setter is private.
+     */
     var location: String
         get() = locationVal
         private set(value) {
             locationVal = value
         }
 
+    /**
+     * The name of the location file.
+     * @return the name of the location file.
+     * The setter is private.
+     */
     var fileName: String
         get() = fileNameVal
         private set(value) {
             fileNameVal = value
         }
 
+    /**
+     * The locations in the location file.
+     * @return a map of the name of files and their locations.
+     * The setter is private.
+     */
     var locations: MutableMap<String, String>
         get() = locationsVal
         private set(value) {
             locationsVal = value
         }
 
+    /**
+     * The complete path of the location file.
+     * @return the complete path of the location file.
+     * The setter is private.
+     */
     var filePath: String
         get() = filePathVal
         private set(value) {
             filePathVal = value
         }
 
+    /**
+     * The number of locations in the location file.
+     * @return the number of locations in the location file.
+     * The setter is private.
+     */
     var numberOfLocations: Int
         get() = numberOfLocationsVal
         private set(value) {
@@ -48,8 +78,24 @@ class LocationFile{
         filePath = ""
         locationLines = mutableMapOf()
         file = File("")
+        numberOfLocationsVal = 0
     }
 
+    /**
+     * A constructor for the LocationFile class.
+     *
+     * Sets the location to "",
+     *
+     * the file name to "",
+     *
+     * the locations to an empty map,
+     *
+     * the number of locations to 0,
+     *
+     * the file path to "",
+     *
+     * and the file to an empty file.
+     */
     constructor() {
         location = ""
         fileName = ""
@@ -57,13 +103,30 @@ class LocationFile{
         filePath = ""
         locationLines = mutableMapOf()
         file = File("")
+        numberOfLocationsVal = 0
     }
 
+    /**
+     * A constructor for the LocationFile class.
+     * Initializes the location file with the given location and file name.
+     * Creates the file if it doesn't exist.
+     * Loads all data from the file into the fields
+     * @param location the location of the location file.
+     * This is not the full path of the file but just the path to its directory.
+     * @param fileName the name of the location file.
+     */
     constructor(location: String, fileName: String) {
         initializeFile(location, fileName)
         initializeLocations()
     }
 
+    /**
+     * A constructor for the LocationFile class.
+     * Initializes the location file with the given full path of the file.
+     * Creates the file if it doesn't exist.
+     * Loads all data from the file into the fields
+     * @param filePath the full path of the location file.
+     */
     constructor(filePath: String) {
         initializeFile(filePath)
         initializeLocations()
@@ -105,6 +168,11 @@ class LocationFile{
         numberOfLocations = locations.size
     }
 
+    /**
+     * Adds a location to the location file.
+     * @param key the name of the location.
+     * @param value the location path of the location.
+     */
     fun addLocation(key: String, value: String) {
         locations[key] = value
         locationLines[key] = numberOfLocations
@@ -112,6 +180,10 @@ class LocationFile{
         numberOfLocations++
     }
 
+    /**
+     * Removes a location from the location file.
+     * @param key the name of the location.
+     */
     fun removeLocation(key: String) {
         locations.remove(key)
         locationLines.remove(key)

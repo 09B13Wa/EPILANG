@@ -11,4 +11,9 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="16" />
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="EpilangGUI" options="--add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.example.epilanggui" />
+    </option>
+  </component>
 </project>

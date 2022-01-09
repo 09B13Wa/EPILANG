@@ -10,6 +10,15 @@ module com.example.epilanggui {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires kotlin.stdlib;
+    requires FranzXaver;
+    requires batik.anim;
+    requires log4j.api;
+    requires xml.apis.ext;
+    requires batik.css;
+    requires batik.svg.dom;
+    requires jdk.xml.dom;
+    requires batik.bridge;
+    requires batik.util;
 
     opens com.example.epilanggui to javafx.fxml;
     exports com.example.epilanggui;

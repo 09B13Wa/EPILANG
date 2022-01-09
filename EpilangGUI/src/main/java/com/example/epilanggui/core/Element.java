@@ -1,6 +1,7 @@
-package com.example.epilanggui.core;
+/**package com.example.epilanggui.core;
 
-import javafx.scene.control.Button;
+import com.example.epilanggui.svg.SVG;
+import javafx.scene.shape.SVGPath;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,38 +9,47 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-public class Category {
+public class Element {
     private String name;
-    private SVG icon;
+    private SVGPath icon;
     //TODO: Add link to Category logic
     private int place;
-    private CategoryBar categoryBar;
-    private Button button;
+    private ElementBar<Element> elementBar;
 
-    public Category(CategoryBar categoryBar, String name, SVG icon, int place) {
-        this.categoryBar = categoryBar;
+    public Element(ElementBar<Element> elementBar, String name, SVGPath icon, int place) {
+        this.elementBar = elementBar;
         this.name = name;
         this.icon = icon;
         this.place = place;
     }
 
-    public Category(CategoryBar categoryBar, String categoryData) {
-        Category category = parseCategorySource(categoryBar, categoryData);
-        this.name = category.name;
-        this.categoryBar = category.categoryBar;
-        this.icon = category.icon;
-        this.place = category.place;
+    public Element(ElementBar<Element> elementBar, String elementData) {
+        Element element = parseCategorySource(elementBar, elementData);
+        this.name = element.name;
+        this.elementBar = element.elementBar;
+        this.icon = element.icon;
+        this.place = element.place;
     }
 
-    public CategoryBar getCategoryBar() {
-        return categoryBar;
+    public ElementBar<Element> getElementBar() {
+        return elementBar;
+    }
+
+    public static <T extends Element> T create(ElementBar<Element> elementBar, String elementData) {
+        Element element = new Element(elementBar, elementData);
+        return (T)element;
+    }
+
+    public static <T extends Element> T create(ElementBar<Element> elementBar, String name, SVGPath icon, int place) {
+        Element element = new Element(elementBar, name, icon, place);
+        return (T)element;
     }
 
     public String getName() {
         return name;
     }
 
-    public SVG getIcon() {
+    public SVGPath getIcon() {
         return icon;
     }
 
@@ -47,7 +57,7 @@ public class Category {
         return place;
     }
 
-    private static Category parseCategorySource(CategoryBar categoryBar, String data) {
+    private Element parseCategorySource(ElementBar elementBar, String data) {
         String[] segments = data.split(":");
         int numberOfSegments = segments.length;
         if (numberOfSegments != 2) {
@@ -57,8 +67,9 @@ public class Category {
         else {
             String name = segments[0];
             String svgPathStr = segments[1];
-            SVG svg = SVG.load(svgPathStr, "category-%s-icon.svg");
-            return new Category(categoryBar, name, svg, categoryBar.getNumberOfCategories());
+            SVG svg = SVG.load(svgPathStr);
+            SVGPath svgPath = svg.exportSvgPath();
+            return new Element(elementBar, name, icon, elementBar.numberOfElements);
         }
     }
 
@@ -82,9 +93,4 @@ public class Category {
 
         return lines;
     }
-
-    private void initializeButton() {
-        button = new Button();
-        button.setGraphic(icon.getSvg());
-    }
-}
+}*/
